@@ -28,10 +28,10 @@ class filter_pumukitpr extends moodle_text_filter {
 
             return $text;
         }
-        
+
         if (stripos($text, '<iframe') !== false) {
             // Look for '/pumoodle/embed', replace the entire <a... </a> tag and send the url as $link[1]
-            $search = '/<iframe.*?src=\"(https:\\/\\/.*?\\/openedx\\/openedx\\/embed.*?)".*?>.*?<\\/iframe>/is';        
+            $search = '/<iframe.*?src=\"(https:\\/\\/.*?\\/openedx\\/openedx\\/embed.*?)".*?>.*?<\\/iframe>/is';
             $newtext = preg_replace_callback($search, 'filter_pumukitpr_openedx_callback', $text);
 
             if (empty($newtext) or $newtext === $text) {
@@ -48,13 +48,13 @@ class filter_pumukitpr extends moodle_text_filter {
             // Look for '/pumoodle/embed', replace the entire <a... </a> tag and send the url as $link[1]
             $search =  '/<a\\s[^>]*href=\"(https?:\\/\\/[^>]*?\\/pumoodle\\/embed.*?)\">.*?<\\/a>/is';
             $newtext = preg_replace_callback($search, 'filter_pumukitpr_callback', $text);
-    
+
             if (empty($newtext) or $newtext === $text) {
                 // error or not filtered
                 unset($newtext);
                 return $text;
             }
-    
+
             return $newtext;
         }
 
@@ -65,6 +65,7 @@ class filter_pumukitpr extends moodle_text_filter {
 
 function filter_pumukitpr_openedx_callback($link) {
     global $CFG;
+    global $USER;
     //Get arguments from url.
 
     $link_params = array();
@@ -77,11 +78,13 @@ function filter_pumukitpr_openedx_callback($link) {
 
     $extra_arguments = array(
         'professor_email' => $email,
-        'hash' => filter_pumukitpr_create_ticket_openedx($mm_id, $email ? $email : "", parse_url($link[1], PHP_URL_HOST))
+        'email' => $USER->email,
+        'username' => $USER->username,
+        'hash' => filter_pumukitpr_create_ticket_openedx($mm_id, $email ? $email : "", $username, parse_url($link[1], PHP_URL_HOST))
     );
     $new_url_arguments = "?".http_build_query(array_merge($extra_arguments, $link_params), '', '&');
     //Create new url with ticket and correct email.
-        
+
     $url = preg_replace("/(\?.*)/i", $new_url_arguments, $link[1]);
     return str_replace($link[1], $url, $link[0]);
 }
