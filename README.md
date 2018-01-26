@@ -56,6 +56,7 @@ Install the Open edX Publication Channel with tag code PUCHOPENEDX.
 ```bash
 $ cd /path/to/pumukit2/
 $ php app/console openedx:init:pubchannel
+$ php app/console openedx:init:resources
 ```
 
 ### Step 6: Add the PUCHOPENEDX tag code to the desire encoder profiles
